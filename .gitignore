@@ -1,0 +1,368 @@
+# ========================================
+# GITIGNORE - MÓDULO DE PREDICCIÓN METEOROLÓGICA
+# ========================================
+
+# =====================================
+# ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# =====================================
+.env
+.env.local
+.env.development
+.env.production
+*.env
+config.json
+secrets.json
+credentials.json
+api_keys.txt
+
+# =====================================
+# MODELOS Y ARCHIVOS ENTRENADOS (GRANDES)
+# =====================================
+# Modelos de Machine Learning
+*.pkl
+*.joblib
+*.h5
+*.keras
+*.ckpt
+*.pb
+*.pth
+*.pt
+*.onnx
+*.tflite
+*.bin
+
+# Modelos específicos del proyecto
+models/trained/
+models/*.pkl
+models/*.keras
+models/*.h5
+models/landslide_model.pkl
+models/precipitation.pkl
+models/surface_pressure.keras
+
+# Checkpoints de entrenamiento
+checkpoints/
+saved_models/
+model_weights/
+
+public/*csv
+public/*json
+public/*xlxs
+public/*grib
+public/*nc
+public/*cvs.gz
+
+# =====================================
+# DATASETS Y ARCHIVOS DE DATOS
+# =====================================
+# Datasets grandes
+*.csv
+*.csv.gz
+*.tsv
+*.parquet
+*.feather
+*.json
+data/
+datasets/
+raw_data/
+processed_data/
+weather_data/
+training_data/
+validation_data/
+test_data/
+
+# Archivos temporales de datos
+*.tmp
+*.temp
+temp_data/
+tmp/
+
+# =====================================
+# ARCHIVOS DE CACHE
+# =====================================
+# Cache de requests
+*.cache.sqlite
+.cache.sqlite
+demo_cache.sqlite
+cache/
+.cache/
+.requests-cache/
+
+# Cache de APIs
+api_cache/
+weather_cache/
+geo_cache/
+
+# =====================================
+# ENTORNOS VIRTUALES
+# =====================================
+venv/
+.venv/
+env/
+.env/
+ENV/
+env.bak/
+venv.bak/
+.virtualenv/
+conda_env/
+.conda/
+
+# =====================================
+# PYTHON ESPECÍFICO
+# =====================================
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+
+# Distribución / empaquetado
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# =====================================
+# ARCHIVOS DE LOGS Y DEBUGGING
+# =====================================
+# Logs generales
+*.log
+logs/
+log/
+*.out
+
+# Logs específicos
+training.log
+prediction.log
+validation.log
+api.log
+error.log
+debug.log
+
+# Archivos de debug
+debug/
+.debug/
+*.debug
+
+# =====================================
+# JUPYTER NOTEBOOKS (CHECKPOINTS)
+# =====================================
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+*.ipynb
+
+# =====================================
+# IDE Y EDITORES
+# =====================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =====================================
+# SISTEMA OPERATIVO
+# =====================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =====================================
+# ARCHIVOS ESPECÍFICOS DEL PROYECTO
+# =====================================
+# Reportes temporales
+reports/temp/
+temp_reports/
+*.report
+
+# Análisis temporales
+analysis/temp/
+analysis/*.csv
+analysis/*.json
+analysis/output/
+
+# Archivos de datos grandes específicos del proyecto
+public/humedad_data_completo.csv.gz
+public/humedad_data_simple.csv.gz
+public/temp_batch_*.csv.gz
+public/temp_batch_final.csv.gz
+public/simma_data.json
+public/extracted_nc_files/
+public/datasets/
+public/temp_csv/
+
+# Formatos de datos grandes
+*.csv.gz
+*.nc 
+*.grib
+*.xlsx
+*.sqlite
+
+
+# Archivos de validación temporales
+validation_temp/
+validation_output/
+
+# Archivos de prueba
+test_output/
+test_results/
+*.test
+
+# Configuraciones locales
+local_config/
+user_settings/
+
+# =====================================
+# ARCHIVOS DE DEPENDENCIAS Y LOCKS
+# =====================================
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Poetry
+poetry.lock
+
+# Conda
+environment.yml.lock
+
+# =====================================
+# ARCHIVOS MULTIMEDIA Y GRANDES
+# =====================================
+# Imágenes generadas
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.svg
+
+# Videos
+*.mp4
+*.avi
+*.mkv
+*.mov
+
+# Archivos comprimidos
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# =====================================
+# DOCUMENTACIÓN GENERADA
+# =====================================
+docs/_build/
+docs/build/
+site/
+_site/
+
+# =====================================
+# ARCHIVOS ESPECÍFICOS A IGNORAR
+# =====================================
+# Archivos de base de datos
+*.db
+*.sqlite3
+*.sqlite
+
+# Archivos de backup
+*.backup
+*.bak
+*.old
+
+# Archivos de configuración específicos
+config_local.py
+settings_local.py
+
+# =====================================
+# EXCEPCIONES (ARCHIVOS A MANTENER)
+# =====================================
+# Mantener algunos archivos importantes aunque coincidan con patrones anteriores
+!requirements.txt
+!README.md
+!LICENSE
+!.gitignore
+!setup.py
+
+# Mantener archivos de configuración de ejemplo
+!config.example.json
+!.env.example
+ 
