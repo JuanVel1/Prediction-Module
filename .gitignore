@@ -30,15 +30,7 @@ api_keys.txt
 *.onnx
 *.tflite
 *.bin
-
-# Modelos específicos del proyecto
-models/trained/
-models/*.pkl
-models/*.keras
-models/*.h5
-models/landslide_model.pkl
-models/precipitation.pkl
-models/surface_pressure.keras
+ 
 
 # Checkpoints de entrenamiento
 checkpoints/
