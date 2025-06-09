@@ -21,8 +21,7 @@ api_keys.txt
 # Modelos de Machine Learning
 *.pkl
 *.joblib
-*.h5
-*.keras
+*.h5 
 *.ckpt
 *.pb
 *.pth
