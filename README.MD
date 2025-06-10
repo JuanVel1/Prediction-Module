@@ -88,7 +88,7 @@ El servidor se ejecutará en: `http://localhost:8000`
 
 ## 📡 **API Endpoints**
 
-### **🌟 Predicción Principal (NUEVO)**
+### **🌟 Predicción Principal**
 ```http
 POST /predict
 Content-Type: application/json
@@ -156,7 +156,7 @@ Content-Type: application/json
 }
 ```
 
-### **🔍 Validación del Sistema (NUEVO)**
+### **🔍 Validación del Sistema**
 ```http
 GET /validation
 ```

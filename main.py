@@ -13,7 +13,16 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from classes.ValidationSystem import ValidationSystem
 
-
+try:
+    from supabase_trainer import SupabaseTrainer, AlertManager
+    trainer = SupabaseTrainer()
+    alert_manager = AlertManager(trainer.client) if trainer.client else None
+    RETRAIN_ENABLED = True
+    ALERTS_ENABLED = trainer.client is not None
+except:
+    RETRAIN_ENABLED = False
+    ALERTS_ENABLED = False
+    alert_manager = None
 
 model_surface_pressure = tf.keras.models.load_model(
     "models/surface_pressure.keras") 
@@ -67,6 +76,46 @@ def get_coordinates(location: str):
         raise HTTPException(
             status_code=500, detail="Failed to connect to Nominatim API")
 
+
+def process_alerts(hourly_predictions, summary):
+    alerts = []
+    
+    high_precip = summary.get("total_precipitation", 0) > 20
+    strong_winds = summary.get("max_windspeed", 0) > 20
+    frost_risk = summary.get("temperature_range", {}).get("min", 10) < 5
+    high_risk_hours = summary.get("high_risk_hours", 0) > 8
+    
+    fog_hours = len([h for h in hourly_predictions if h["risks"]["fog_risk"] == "ALTO"])
+    
+    if high_precip:
+        alerts.append({
+            "type": "PRECIPITATION",
+            "level": "ALTO",
+            "description": f"Precipitación acumulada alta: {summary['total_precipitation']:.1f}mm"
+        })
+    
+    if strong_winds:
+        alerts.append({
+            "type": "WIND",
+            "level": "ALTO", 
+            "description": f"Vientos fuertes: {summary['max_windspeed']:.1f} km/h"
+        })
+    
+    if frost_risk:
+        alerts.append({
+            "type": "FROST",
+            "level": "ALTO",
+            "description": f"Riesgo de heladas: {summary['temperature_range']['min']:.1f}°C"
+        })
+    
+    if fog_hours > 4:
+        alerts.append({
+            "type": "FOG",
+            "level": "MEDIO" if fog_hours < 8 else "ALTO",
+            "description": f"Niebla esperada durante {fog_hours} horas"
+        })
+    
+    return alerts
 
 @app.post("/predict")
 def predict(location: str = Body(..., embed=True)):
@@ -156,6 +205,19 @@ def predict(location: str = Body(..., embed=True)):
         if isinstance(high_risk, (int, float)) and high_risk > 8:
             general_alerts.append("🚨 Múltiples horas de alto riesgo")
 
+        alerts_data = process_alerts(hourly_predictions, summary)
+        
+        weather_data_id = None
+        if ALERTS_ENABLED and alert_manager and alerts_data:
+            try:
+                weather_data_id = alert_manager.save_weather_data(
+                    location, lat, lon, data['hourly_data']
+                )
+                if weather_data_id:
+                    alert_manager.create_alerts(weather_data_id, alerts_data)
+            except Exception as e:
+                print(f"Error guardando alertas: {e}")
+
         return {
             "location": location,
             "coordinates": {"lat": lat, "lon": lon},
@@ -174,7 +236,10 @@ def predict(location: str = Body(..., embed=True)):
                 "prediction_classes_avg": f"{np.mean([eval.get('overall_validity', 0) for eval in validation_report.get('prediction_classes_evaluation', {}).values()]):.1f}%",
                 "recommendations": validation_report.get('recommendations', []),
                 "last_validation": validation_report.get('validation_timestamp', 'N/A')
-            }
+            },
+            "alerts": alerts_data,
+            "alerts_saved": len(alerts_data) if weather_data_id else 0,
+            "database_id": weather_data_id
         }
         
     except Exception as e:
@@ -321,6 +386,48 @@ def make_prediction(model, data, model_type="keras"):
             detail=f"Error making prediction with {model_type} model: {str(e)}"
         )
 
+
+@app.get("/alerts/{location}")
+def get_alerts(location: str):
+    if not ALERTS_ENABLED:
+        raise HTTPException(status_code=503, detail="Alertas no disponibles")
+    
+    response = trainer.client.table("alerts")\
+        .select("*, weather_data!inner(location)")\
+        .eq("weather_data.location", location)\
+        .order("created_at", desc=True)\
+        .limit(50)\
+        .execute()
+    
+    return {"alerts": response.data}
+
+@app.get("/alerts/recent/{hours}")
+def get_recent_alerts(hours: int = 24):
+    if not ALERTS_ENABLED:
+        raise HTTPException(status_code=503, detail="Alertas no disponibles")
+    
+    from datetime import datetime, timedelta
+    cutoff = datetime.utcnow() - timedelta(hours=hours)
+    
+    response = trainer.client.table("alerts")\
+        .select("*, weather_data(location, latitude, longitude)")\
+        .gte("created_at", cutoff.isoformat())\
+        .order("created_at", desc=True)\
+        .execute()
+    
+    return {"alerts": response.data, "period_hours": hours}
+
+@app.post("/retrain")
+def retrain():
+    if not RETRAIN_ENABLED:
+        raise HTTPException(status_code=503, detail="Reentrenamiento no disponible")
+    return trainer.retrain()
+
+@app.get("/retrain/status")
+def retrain_status():
+    if not RETRAIN_ENABLED:
+        return {"enabled": False}
+    return {"enabled": True, "connected": trainer.client is not None}
 
 # Iniciar la aplicación FastAPI
 if __name__ == "__main__":
